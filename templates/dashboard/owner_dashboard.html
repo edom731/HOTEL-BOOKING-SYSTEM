@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard - EthioStay{% endblock %}
+{% block content %}
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="dash-logo">🏨 Owner Panel</div>
+    <nav class="dash-nav">
+      <a href="{% url 'owner_dashboard' %}" class="active">🏠 Overview</a>
+      <a href="{% url 'add_hotel' %}">➕ Add Hotel</a>
+      <a href="{% url 'hotel_list' %}">🔍 Browse Hotels</a>
+      <a href="{% url 'profile' %}">👤 My Profile</a>
+      <a href="{% url 'home' %}">🌐 View Site</a>
+      <a href="{% url 'logout' %}">🚪 Logout</a>
+    </nav>
+  </div>
+  <div class="dash-main">
+    <div style="margin-bottom:2rem;">
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.25rem;">Welcome back, {{ user.first_name|default:user.username }}! 👋</h1>
+      <p style="color:var(--text-muted);">Manage your hotels and reservations</p>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card"><span class="stat-icon">🏨</span><div class="stat-value">{{ hotels.count }}</div><div class="stat-label">My Hotels</div></div>
+      <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-value">{{ recent_bookings.count }}</div><div class="stat-label">Recent Bookings</div></div>
+      <div class="stat-card"><span class="stat-icon">💰</span><div class="stat-value" style="font-size:1.4rem;">ETB {{ total_revenue|floatformat:0 }}</div><div class="stat-label">Total Revenue</div></div>
+    </div>
+
+    <!-- My Hotels -->
+    <div class="table-card mb-3">
+      <div class="table-card-header">
+        <h3>🏨 My Hotels</h3>
+        <a href="{% url 'add_hotel' %}" class="btn btn-primary btn-sm">+ Add Hotel</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Hotel</th><th>City</th><th>Stars</th><th>Price/Night</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for hotel in hotels %}
+          <tr>
+            <td><strong>{{ hotel.name }}</strong></td>
+            <td>{{ hotel.city.name }}</td>
+            <td>{% for i in "12345" %}<span style="color:{% if forloop.counter <= hotel.star_rating %}var(--gold){% else %}#444{% endif %};">★</span>{% endfor %}</td>
+            <td style="color:var(--gold);">ETB {{ hotel.price_per_night }}</td>
+            <td>
+              <a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-outline btn-sm">View</a>
+              <a href="{% url 'manage_rooms' hotel.pk %}" class="btn btn-outline btn-sm">Rooms</a>
+              <a href="{% url 'edit_hotel' hotel.pk %}" class="btn btn-outline btn-sm">Edit</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">No hotels yet. <a href="{% url 'add_hotel' %}">Add your first hotel →</a></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="table-card">
+      <div class="table-card-header"><h3>📋 Recent Bookings</h3></div>
+      <table class="data-table">
+        <thead><tr><th>Ref</th><th>Guest</th><th>Hotel/Room</th><th>Dates</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for b in recent_bookings %}
+          <tr>
+            <td style="color:var(--gold);font-size:0.8rem;">{{ b.booking_ref }}</td>
+            <td>{{ b.user.get_full_name|default:b.user.username }}</td>
+            <td>{{ b.room.hotel.name }} / {{ b.room.get_room_type_display }}</td>
+            <td style="font-size:0.82rem;">{{ b.check_in|date:"M d" }} – {{ b.check_out|date:"M d, Y" }}</td>
+            <td style="color:var(--gold);">ETB {{ b.total_price }}</td>
+            <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">No bookings yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

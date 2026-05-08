@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Manage Hotels - EthioStay{% endblock %}
+{% block content %}
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="dash-logo">⚙️ Admin Panel</div>
+    <nav class="dash-nav">
+      <a href="{% url 'admin_dashboard' %}">🏠 Overview</a>
+      <a href="{% url 'manage_users' %}">👥 Users</a>
+      <a href="{% url 'manage_hotels' %}" class="active">🏨 Hotels</a>
+      <a href="/admin/">🔧 Django Admin</a>
+      <a href="{% url 'home' %}">🌐 View Site</a>
+      <a href="{% url 'logout' %}">🚪 Logout</a>
+    </nav>
+  </div>
+  <div class="dash-main">
+    <div style="margin-bottom:2rem;"><h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;">🏨 All Hotels</h1><p style="color:var(--text-muted);">{{ hotels.count }} hotels in the system</p></div>
+    <div class="table-card">
+      <table class="data-table">
+        <thead><tr><th>Hotel</th><th>City</th><th>Owner</th><th>Stars</th><th>Price/Night</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for hotel in hotels %}
+          <tr>
+            <td><strong>{{ hotel.name }}</strong></td>
+            <td>{{ hotel.city.name }}</td>
+            <td style="font-size:0.82rem;">{{ hotel.owner.username }}</td>
+            <td>{% for i in "12345" %}<span style="color:{% if forloop.counter <= hotel.star_rating %}var(--gold){% else %}#444{% endif %};">★</span>{% endfor %}</td>
+            <td style="color:var(--gold);">ETB {{ hotel.price_per_night }}</td>
+            <td>{% if hotel.is_active %}<span class="badge badge-confirmed">Active</span>{% else %}<span class="badge badge-cancelled">Inactive</span>{% endif %}</td>
+            <td><a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No hotels yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Manage Rooms - EthioStay{% endblock %}
+{% block content %}
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="dash-logo">🏨 Owner Panel</div>
+    <nav class="dash-nav">
+      <a href="{% url 'owner_dashboard' %}">🏠 Overview</a>
+      <a href="{% url 'add_hotel' %}">➕ Add Hotel</a>
+      <a href="{% url 'home' %}">🌐 View Site</a>
+      <a href="{% url 'logout' %}">🚪 Logout</a>
+    </nav>
+  </div>
+  <div class="dash-main">
+    <div style="margin-bottom:2rem;">
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;">Manage Rooms</h1>
+      <p style="color:var(--text-muted);">{{ hotel.name }} &bull; {{ rooms.count }} room{{ rooms.count|pluralize }}</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+      <!-- Add Room Form -->
+      <div class="form-card" style="max-width:100%;">
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1.5rem;color:var(--gold);">+ Add New Room</h2>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<span class="form-error">{{ field.errors.0 }}</span>{% endif %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-block">Add Room</button>
+        </form>
+      </div>
+
+      <!-- Room List -->
+      <div>
+        <div class="table-card">
+          <div class="table-card-header"><h3>Current Rooms</h3></div>
+          <table class="data-table">
+            <thead><tr><th>No.</th><th>Type</th><th>Price</th><th>Cap.</th><th>Available</th></tr></thead>
+            <tbody>
+              {% for room in rooms %}
+              <tr>
+                <td><strong>{{ room.room_number }}</strong></td>
+                <td>{{ room.get_room_type_display }}</td>
+                <td style="color:var(--gold);">ETB {{ room.price_per_night }}</td>
+                <td>{{ room.capacity }}</td>
+                <td>{% if room.is_available %}<span class="badge badge-confirmed">Yes</span>{% else %}<span class="badge badge-cancelled">No</span>{% endif %}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">No rooms added yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

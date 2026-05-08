@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - EthioStay{% endblock %}
+{% block content %}
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="dash-logo">⚙️ Admin Panel</div>
+    <nav class="dash-nav">
+      <a href="{% url 'admin_dashboard' %}" class="active">🏠 Overview</a>
+      <a href="{% url 'manage_users' %}">👥 Users</a>
+      <a href="{% url 'manage_hotels' %}">🏨 Hotels</a>
+      <a href="{% url 'hotel_list' %}">🔍 Browse Hotels</a>
+      <a href="/admin/">🔧 Django Admin</a>
+      <a href="{% url 'home' %}">🌐 View Site</a>
+      <a href="{% url 'logout' %}">🚪 Logout</a>
+    </nav>
+  </div>
+  <div class="dash-main">
+    <div style="margin-bottom:2rem;">
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.25rem;">Admin Dashboard 🛡️</h1>
+      <p style="color:var(--text-muted);">Full system overview and management</p>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card"><span class="stat-icon">👥</span><div class="stat-value">{{ total_users }}</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><span class="stat-icon">🏨</span><div class="stat-value">{{ total_hotels }}</div><div class="stat-label">Hotels Listed</div></div>
+      <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-value">{{ total_bookings }}</div><div class="stat-label">Total Bookings</div></div>
+      <div class="stat-card"><span class="stat-icon">💰</span><div class="stat-value" style="font-size:1.3rem;">ETB {{ total_revenue|floatformat:0 }}</div><div class="stat-label">Revenue</div></div>
+    </div>
+
+    <div class="table-card mb-3">
+      <div class="table-card-header">
+        <h3>📋 Recent Bookings</h3>
+        <span style="font-size:0.82rem;color:var(--text-muted);">Last 15</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Ref</th><th>Guest</th><th>Hotel</th><th>Dates</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for b in recent_bookings %}
+          <tr>
+            <td style="color:var(--gold);font-size:0.8rem;">{{ b.booking_ref }}</td>
+            <td>{{ b.user.username }}</td>
+            <td>{{ b.room.hotel.name }}</td>
+            <td style="font-size:0.82rem;">{{ b.check_in|date:"M d" }} – {{ b.check_out|date:"M d, Y" }}</td>
+            <td style="color:var(--gold);">ETB {{ b.total_price }}</td>
+            <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">No bookings yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>👥 Recent Users</h3>
+        <a href="{% url 'manage_users' %}" class="btn btn-outline btn-sm">View All</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+        <tbody>
+          {% for u in recent_users %}
+          <tr>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.get_full_name|default:"-" }}</td>
+            <td style="font-size:0.82rem;">{{ u.email }}</td>
+            <td><span class="badge badge-confirmed">{% if u.is_staff %}Admin{% else %}{{ u.profile.get_role_display|default:"Customer" }}{% endif %}</span></td>
+            <td style="font-size:0.82rem;color:var(--text-muted);">{{ u.date_joined|date:"M d, Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No users yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

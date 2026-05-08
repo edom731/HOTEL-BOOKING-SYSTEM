@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Browse Hotels - EthioStay{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1>🏨 Browse Hotels</h1>
+    <p>{{ hotels.count }} hotel{{ hotels.count|pluralize }} found</p>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <!-- FILTER BAR -->
+  <form method="get" class="filter-bar">
+    <div class="filter-group">
+      <label>🔍 Search</label>
+      <input type="text" name="q" value="{{ search_q|default:'' }}" placeholder="Hotel name, city...">
+    </div>
+    <div class="filter-group">
+      <label>🏙️ City</label>
+      <select name="city">
+        <option value="">All Cities</option>
+        {% for city in cities %}
+          <option value="{{ city.id }}" {% if selected_city == city.id|stringformat:'s' %}selected{% endif %}>{{ city.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>💰 Min Price (ETB)</label>
+      <input type="number" name="min_price" value="{{ min_price|default:'' }}" placeholder="0">
+    </div>
+    <div class="filter-group">
+      <label>💰 Max Price (ETB)</label>
+      <input type="number" name="max_price" value="{{ max_price|default:'' }}" placeholder="99999">
+    </div>
+    <div class="filter-group">
+      <label>⭐ Stars</label>
+      <select name="stars">
+        <option value="">Any</option>
+        {% for i in "54321" %}
+          <option value="{{ i }}" {% if stars == i %}selected{% endif %}>{{ i }} Stars</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{% url 'hotel_list' %}" class="btn btn-outline">Clear</a>
+  </form>
+
+  <!-- HOTEL GRID -->
+  <div class="hotels-grid">
+    {% for hotel in hotels %}
+    <div class="hotel-card">
+      <div class="hotel-card-img">
+        {% if hotel.thumbnail %}
+          <img src="{{ hotel.thumbnail.url }}" alt="{{ hotel.name }}">
+        {% else %}
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#16213E,#243353);display:flex;align-items:center;justify-content:center;font-size:4rem;">🏨</div>
+        {% endif %}
+        <div class="hotel-card-badge">⭐ {{ hotel.star_rating }} Star</div>
+      </div>
+      <div class="hotel-card-body">
+        <h3>{{ hotel.name }}</h3>
+        <p class="hotel-card-city">📍 {{ hotel.city.name }}</p>
+        <div class="star-rating">
+          {% for i in "12345" %}
+            <span class="star {% if forloop.counter <= hotel.star_rating %}filled{% endif %}">★</span>
+          {% endfor %}
+          <span style="font-size:0.78rem;color:var(--text-muted);margin-left:0.3rem;">({{ hotel.review_count }})</span>
+        </div>
+        {% if hotel.amenities %}
+        <div class="amenities-list" style="margin-bottom:0.75rem;">
+          {% for tag in hotel.get_amenities_list|slice:":3" %}
+            <span class="amenity-tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="hotel-price">
+          <span class="amount">ETB {{ hotel.price_per_night }}</span>
+          <span class="per">/ night</span>
+        </div>
+        <a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-primary btn-block">View & Book</a>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-muted);">
+      <div style="font-size:4rem;margin-bottom:1rem;">🔍</div>
+      <h3 style="margin-bottom:0.5rem;">No hotels found</h3>
+      <p>Try adjusting your search filters.</p>
+      <a href="{% url 'hotel_list' %}" class="btn btn-outline mt-2">Clear Filters</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

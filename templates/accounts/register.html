@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Register - EthioStay{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 1rem 3rem;background:linear-gradient(135deg,var(--dark),var(--dark-2));">
+  <div style="width:100%;max-width:580px;">
+    <div class="form-card">
+      <div style="text-align:center;margin-bottom:2rem;">
+        <div style="font-size:3rem;margin-bottom:0.5rem;">🏨</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:2rem;">Join EthioStay</h1>
+        <p class="text-muted" style="margin-top:0.4rem;">Create your account to start booking</p>
+      </div>
+
+      {% if form.errors %}
+      <div class="alert alert-error">Please fix the errors below.</div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <!-- Role Selection -->
+        <div class="form-group">
+          <label>I am a...</label>
+          <div class="role-cards">
+            <div class="role-card">
+              <input type="radio" name="role" id="role_customer" value="customer" checked>
+              <label for="role_customer">
+                <span class="icon">🧳</span>
+                <strong>Customer</strong>
+                <span style="font-size:0.75rem;color:var(--text-muted);">Book hotels</span>
+              </label>
+            </div>
+            <div class="role-card">
+              <input type="radio" name="role" id="role_owner" value="hotel_owner">
+              <label for="role_owner">
+                <span class="icon">🏨</span>
+                <strong>Hotel Owner</strong>
+                <span style="font-size:0.75rem;color:var(--text-muted);">List hotels</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" placeholder="Abebe" required>
+            {% if form.first_name.errors %}<span class="form-error">{{ form.first_name.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" placeholder="Kebede" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" value="{{ form.username.value|default:'' }}" placeholder="abebekebede" required>
+          {% if form.username.errors %}<span class="form-error">{{ form.username.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="abebe@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="+251 91 234 5678">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password1" placeholder="••••••••" required>
+            {% if form.password1.errors %}<span class="form-error">{{ form.password1.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" name="password2" placeholder="••••••••" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:0.5rem;">Create Account 🚀</button>
+      </form>
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.9rem;color:var(--text-muted);">
+        Already have an account? <a href="{% url 'login' %}" style="color:var(--gold);">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
